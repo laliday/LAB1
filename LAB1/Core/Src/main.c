@@ -63,7 +63,7 @@ PortPin L[4] =
 		{ GPIOB, GPIO_PIN_5 },
 		{ GPIOB, GPIO_PIN_4 } };
 uint32_t ButtonMatrix = 0;
-
+uint16_t state = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -71,7 +71,7 @@ void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_USART2_UART_Init(void);
 /* USER CODE BEGIN PFP */
-
+void ReadMatrixButton_1Row();
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -109,7 +109,7 @@ int main(void)
   MX_GPIO_Init();
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
-  void ReadMatrixButton_1Row();
+
 
   /* USER CODE END 2 */
 
@@ -135,6 +135,123 @@ int main(void)
 	   }
 	   else {
 		   flag = 0;
+	   }
+
+
+	   switch(state){
+	   case 0:
+		   HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_RESET);
+		   if( ButtonMatrix == 512 && flag == 1){
+			   state = 1;
+		   }
+		   else if(ButtonMatrix != 512 && flag == 1){
+			   state = 13;
+		   }
+		   break;
+
+	   case 1:
+		   if (ButtonMatrix == 2 && flag == 1){
+			   state = 2;
+		   }
+		   else if (ButtonMatrix != 2 && flag == 1){
+			   state = 13;
+		   }
+		   break;
+
+	   case 2:
+		   if (ButtonMatrix == 1024 && flag == 1){
+			   state = 3;
+		   }
+		   else if (ButtonMatrix != 1024 && flag == 1){
+			   state = 13;
+		   }
+		   break;
+	   case 3:
+		   if (ButtonMatrix == 2 && flag == 1){
+			   state = 4;
+		   }
+		   else if (ButtonMatrix != 2 && flag == 1){
+			   state = 13;
+		   }
+		   break;
+	   case 4:
+		   if (ButtonMatrix == 8 && flag == 1){
+			   state = 5;
+		   }
+		   else if (ButtonMatrix != 8 && flag == 1){
+			   state = 13;
+		   }
+		   break;
+	   case 5:
+		   if (ButtonMatrix == 32 && flag == 1){
+			   state = 6;
+		   }
+		   else if (ButtonMatrix != 32 && flag == 1){
+			   state = 13;
+		   }
+		   break;
+	   case 6:
+		   if (ButtonMatrix == 8 && flag == 1){
+			   state = 7;
+		   }
+		   else if (ButtonMatrix != 8 && flag == 1){
+			   state = 13;
+		   }
+		   break;
+	   case 7:
+		   if (ButtonMatrix == 8 && flag == 1){
+			   state = 8;
+		   }
+		   else if (ButtonMatrix != 8 && flag == 1){
+			   state = 13;
+		   }
+		   break;
+	   case 8:
+		   if (ButtonMatrix == 8 && flag == 1){
+			   state = 9;
+		   }
+		   else if (ButtonMatrix != 8 && flag == 1){
+			   state = 13;
+		   }
+		   break;
+	   case 9:
+		   if (ButtonMatrix == 2 && flag == 1){
+			   state = 10;
+		   }
+		   else if (ButtonMatrix != 2 && flag == 1){
+			   state = 13;
+		   }
+		   break;
+	   case 10:
+		   if (ButtonMatrix == 1 && flag == 1){
+			   state = 11;
+		   }
+		   else if (ButtonMatrix != 1 && flag == 1){
+			   state = 13;
+		   }
+		   break;
+	   case 11:
+		   if (ButtonMatrix == 32768 && flag == 1){
+			   state = 12;
+
+		   }
+		   else if (ButtonMatrix != 32768 && flag == 1){
+			   state = 13;
+		   }
+		   break;
+	   case 12:
+		   HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_SET);
+		   if (ButtonMatrix == 4096 && flag == 1){
+			   state = 0;
+		   }
+		   break;
+	   case 13:
+		   if (ButtonMatrix == 4096 && flag == 1){
+			   state = 0;
+		   }
+		   break;
+
+
 	   }
 	   last = current;
   }
@@ -251,8 +368,15 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(B1_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : LD2_Pin PA7 PA9 */
-  GPIO_InitStruct.Pin = LD2_Pin|GPIO_PIN_7|GPIO_PIN_9;
+  /*Configure GPIO pin : LD2_Pin */
+  GPIO_InitStruct.Pin = LD2_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(LD2_GPIO_Port, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : PA7 PA9 */
+  GPIO_InitStruct.Pin = GPIO_PIN_7|GPIO_PIN_9;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_OD;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
