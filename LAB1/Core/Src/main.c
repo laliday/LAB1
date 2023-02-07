@@ -42,6 +42,10 @@
 UART_HandleTypeDef huart2;
 
 /* USER CODE BEGIN PV */
+
+uint8_t flag = 0;
+uint32_t current = 0;
+uint32_t last = 0;
 typedef struct PortAndPin
 {
 	GPIO_TypeDef* PORT;
@@ -58,7 +62,8 @@ PortPin L[4] =
 		{ GPIOB, GPIO_PIN_3 },
 		{ GPIOB, GPIO_PIN_5 },
 		{ GPIOB, GPIO_PIN_4 } };
-uint16_t ButtonMatrix = 0;
+uint32_t ButtonMatrix = 0;
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -71,7 +76,7 @@ static void MX_USART2_UART_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
+GPIO_PinState detect;
 /* USER CODE END 0 */
 
 /**
@@ -115,13 +120,25 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-	  static uint32_t timestamp = 0; //จับเวลาในการอ่าน
+	  current = ButtonMatrix;
+	  static uint32_t timestamp = 0; //จับเวลาใน�?ารอ่าน
 	     if(HAL_GetTick()>=timestamp)
 	     {
 	      timestamp = HAL_GetTick() + 10;
+//	      detect = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_5);
 	      ReadMatrixButton_1Row();
 	     }
+
+	   if(last == 0 && current != 0)
+	   {
+		   flag = 1 ;
+	   }
+	   else {
+		   flag = 0;
+	   }
+	   last = current;
   }
+
   /* USER CODE END 3 */
 }
 
@@ -236,7 +253,7 @@ static void MX_GPIO_Init(void)
 
   /*Configure GPIO pins : LD2_Pin PA7 PA9 */
   GPIO_InitStruct.Pin = LD2_Pin|GPIO_PIN_7|GPIO_PIN_9;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_OD;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
@@ -248,8 +265,8 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
-  /*Configure GPIO pin : PA10 */
-  GPIO_InitStruct.Pin = GPIO_PIN_10;
+  /*Configure GPIO pins : PA8 PA10 */
+  GPIO_InitStruct.Pin = GPIO_PIN_8|GPIO_PIN_10;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_PULLUP;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
@@ -262,7 +279,7 @@ static void MX_GPIO_Init(void)
 
   /*Configure GPIO pin : PB6 */
   GPIO_InitStruct.Pin = GPIO_PIN_6;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_OD;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
