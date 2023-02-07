@@ -115,6 +115,12 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+	  static uint32_t timestamp = 0; //จับเวลาในการอ่าน
+	     if(HAL_GetTick()>=timestamp)
+	     {
+	      timestamp = HAL_GetTick() + 10;
+	      ReadMatrixButton_1Row();
+	     }
   }
   /* USER CODE END 3 */
 }
@@ -269,13 +275,13 @@ void ReadMatrixButton_1Row() {
     register int i;
     for (i = 0; i < 4; i++) {
         if (HAL_GPIO_ReadPin(L[i].PORT, L[i].PIN)) {
-            ButtonMatrix &= ~(1 << (X * 4 + i)); // << คือ�?าร shift ค่าเข้ามา
+            ButtonMatrix &= ~(1 << (X * 4 + i)); // << คือ�?าร shift ค่าเข้ามา
         } else {
             ButtonMatrix |= 1 << (X * 4 + i); //
         }
     }
     HAL_GPIO_WritePin(R[X].PORT, R[X].PIN, 1);
-    HAL_GPIO_WritePin(R[(X + 1) % 4].PORT, R[(X + 1) % 4].PIN, 0); // output จ่ายไฟให้�?ต่ละหลั�?
+    HAL_GPIO_WritePin(R[(X + 1) % 4].PORT, R[(X + 1) % 4].PIN, 0); // output จ่ายไฟให้�?ต่ละหลั�?
     X++;
     X %= 4;
 }
